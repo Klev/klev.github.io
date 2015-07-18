@@ -40,7 +40,7 @@ function init() {
 
     bufferId = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
-    gl.bufferData(gl.ARRAY_BUFFER, 100 * 8 * Math.pow(3, 6), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, 110 * 8 * Math.pow(3, 6), gl.STATIC_DRAW);
 
 
 
@@ -50,31 +50,36 @@ function init() {
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    document.getElementById("tessec_slider").onchange = function () {
-        numTimesToSubdivide = parseInt(event.srcElement.value);
+    document.getElementById("tessec_slider").onchange = function (event) {
+        var target = event.target || event.srcElement;	
+        numTimesToSubdivide = parseInt(target.value);
         render();
-        document.getElementById("tessec_text").value = event.srcElement.value;
+        document.getElementById("tessec_text").value = target.value;
     };
 
-    document.getElementById("twist_slider").onchange = function () {
-        theta = parseFloat(event.srcElement.value);
+    document.getElementById("twist_slider").onchange = function (event) {
+    	var target = event.target || event.srcElement;	
+        theta = parseFloat(target.value);
         render();
-        document.getElementById("twist_text").value = event.srcElement.value;
+        document.getElementById("twist_text").value = target.value;
     }
 
-    document.getElementById("vertex_slider").onchange = function () {
-        vertex = parseInt(event.srcElement.value);
+    document.getElementById("vertex_slider").onchange = function (event) {
+        var target = event.target || event.srcElement;
+        vertex = parseInt(target.value);
         render();
-        document.getElementById("vertex_text").value = event.srcElement.value;
+        document.getElementById("vertex_text").value = target.value;
     }
     
-    document.getElementById("filled_radio").onchange = function () {
-    	gasket = !event.srcElement.checked;
+    document.getElementById("filled_radio").onchange = function (event) {
+    	var target = event.target || event.srcElement;
+    	gasket = !target.checked;
     	render();
     }
     
-    document.getElementById("gasket_radio").onchange = function () {
-    	gasket = event.srcElement.checked;
+    document.getElementById("gasket_radio").onchange = function (event) {
+    	var target = event.target || event.srcElement;
+    	gasket = target.checked;
     	render();
     }
 
