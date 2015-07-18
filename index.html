@@ -48,10 +48,16 @@
 			360 <input id="twist_text" type="text" value="0" size="3" readonly/>
 		</div>
 		<div>
-			Number of Vertices<br/>
+			Polygon vertices<br/>
 			3 <input id="vertex_slider" type="range"
-   				     min="3" max="7" value="3" step="1" />
-			7 <input id="vertex_text" type="text" value="0" size="3" readonly/>
+   				     min="3" max="6" value="3" step="1" />
+			6 <input id="vertex_text" type="text" value="3" size="3" readonly/>
+		</div>
+		<div>
+			<form>
+				<input id="filled_radio" type="radio" name="fill" value="Filled" checked>Filled 
+				<input id="gasket_radio" type="radio" name="fill" value="Gasket">Gasket
+			</form>
 		</div>
 	</div>
 	<div id="container">

@@ -8,6 +8,7 @@ var points = [];
 var numTimesToSubdivide = 0;
 var theta = 0.0;
 var vertex = 3;
+var gasket = false;
 
 var bufferId;
 
@@ -66,6 +67,16 @@ function init() {
         render();
         document.getElementById("vertex_text").value = event.srcElement.value;
     }
+    
+    document.getElementById("filled_radio").onchange = function () {
+    	gasket = !event.srcElement.checked;
+    	render();
+    }
+    
+    document.getElementById("gasket_radio").onchange = function () {
+    	gasket = event.srcElement.checked;
+    	render();
+    }
 
     render();
 };
@@ -105,7 +116,8 @@ function divideTriangle(a, b, c, count) {
         divideTriangle(a, ab, ac, count);
         divideTriangle(c, ac, bc, count);
         divideTriangle(b, bc, ab, count);
-        divideTriangle(ac, ab, bc, count);
+        
+        if (!gasket) divideTriangle(ac, ab, bc, count);
     }
 }
 
@@ -125,8 +137,9 @@ function generatePolygon(firstVertice, numberOfVertices) {
 }
 
 function generateMeshFromBasis(vertices, subdivision) {
-    for (var i = 0; i < vertices.length - 2; ++i) {
-        divideTriangle(vertices[0], vertices[1 + i], vertices[2 + i], subdivision);
+    for (var i = 0; i < vertices.length; ++i) {
+        //divideTriangle(vertices[0], vertices[1 + i], vertices[2 + i], subdivision);
+        divideTriangle(vec2(0.0, 0.0), vertices[i], vertices[(i + 1) % vertices.length], subdivision);
     }
 }
 
