@@ -2,7 +2,10 @@
 	float: left;
 	border: 1px solid #000000;
 	border-radius: 25px;
-	height: 516px;
+	padding-top: 7px;
+	text-align: center;
+	height: 258px;
+	width: 200px;
 	margin-right: 5px;
 }
 
