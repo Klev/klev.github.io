@@ -52,16 +52,19 @@ function init() {
     document.getElementById("tessec_slider").onchange = function () {
         numTimesToSubdivide = parseInt(event.srcElement.value);
         render();
+        document.getElementById("tessec_text").value = event.srcElement.value;
     };
 
     document.getElementById("twist_slider").onchange = function () {
         theta = parseFloat(event.srcElement.value);
         render();
+        document.getElementById("twist_text").value = event.srcElement.value;
     }
 
     document.getElementById("vertex_slider").onchange = function () {
         vertex = parseInt(event.srcElement.value);
         render();
+        document.getElementById("vertex_text").value = event.srcElement.value;
     }
 
     render();
