@@ -7,6 +7,7 @@ var points = [];
 
 var numTimesToSubdivide = 0;
 var theta = 0.0;
+var thetaLoc;
 var vertex = 3;
 var gasket = false;
 
@@ -49,6 +50,8 @@ function init() {
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
+    
+    thetaLoc = gl.getUniformLocation(program, "theta");
 
     document.getElementById("tessec_slider").onchange = function (event) {
         var target = event.target || event.srcElement;	
@@ -87,16 +90,7 @@ function init() {
 };
 
 function triangle(a, b, c) {
-    var twist = function (vertex) {
-        var d = Math.sqrt(vertex[0] * vertex[0] + vertex[1] * vertex[1]);
-        var radius = theta * Math.PI / 180;
-        var x = vertex[0] * Math.cos(d * radius) - vertex[1] * Math.sin(d * radius);
-        var y = vertex[0] * Math.sin(d * radius) + vertex[1] * Math.cos(d * radius);
-
-        return vec2(x, y);
-    };
-
-    points.push(twist(a), twist(b), twist(c));
+    points.push(a, b, c);
 }
 
 function divideTriangle(a, b, c, count) {
@@ -156,6 +150,8 @@ function render() {
     generateMeshFromBasis(vertices, numTimesToSubdivide);
     //divideTriangle(vertices[0], vertices[1], vertices[2],
     //                numTimesToSubdivide);
+    
+    gl.uniform1f(thetaLoc, theta);
 
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(points));
     gl.clear(gl.COLOR_BUFFER_BIT);

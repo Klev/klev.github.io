@@ -4,22 +4,33 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>Assignment 1: Tessellaction and Twist</title>
 
-
     <script id="vertex-shader" type="x-shader/x-vertex">
-        attribute vec4 vPosition;
-
-        void
-        main()
+    	#define M_PI 3.1415926535897932384626433832795
+    	
+    	attribute vec4 vPosition;
+        
+		uniform float theta;
+		
+		vec4 twist(vec4 position)
+		{
+			float d = sqrt(position.x * position.x + position.y * position.y);
+			float r = theta * M_PI / 180.0;
+			float x = position.x * cos(d * r) - position.y * sin(d * r);
+			float y = position.x * sin(d * r) + position.y * cos(d * r);
+			
+			return vec4(x, y, position.z, position.w);
+		}
+		
+		void main()
         {
-            gl_Position = vPosition;
+            gl_Position = twist(vPosition);
         }
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
 
-        void
-        main()
+        void main()
         {
             gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
         }
