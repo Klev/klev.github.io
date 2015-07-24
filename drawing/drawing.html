@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
@@ -6,6 +6,9 @@
 		
 		<script id="vertex-shader" type="x-shader/x-vertex">
     		attribute vec4 vPosition;
+            attribute vec4 vColor;
+
+            varying vec4 fColor;
     	    
     	    void main()
     	    {
@@ -16,9 +19,10 @@
     	<script id="fragment-shader" type="x-shader/x-fragment">
     	    precision mediump float;
 	
+            varying vec4 fColor;
     	    void main()
     	    {
-    	        gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+    	        gl_FragColor = fColor;
     	    }
     	</script>
     
@@ -26,13 +30,27 @@
     	<script type="text/javascript" src="../Common/initShaders.js"></script>
     	<script type="text/javascript" src="../Common/MV.js"></script>
     	<script type="text/javascript" src="drawing.js"></script>
-    	<link rel="stylesheet" type="text/css" href="drawing.css">
+        <!--<script type="text/javascript" src="jscolor.js"></script>-->
+    	<!--<link rel="stylesheet" type="text/css" href="drawing.css">-->
 	</head>
 	<body>
-		<div id="container">
-    		<canvas id="gl-canvas" width="512" height="512">
-        		Oops ... your browser doesn't support the HTML5 canvas element
-    		</canvas>
-    	</div>
+        <div>
+            <canvas id="gl-canvas" width="512" height="512">
+                Oops ... your browser doesn't support the HTML5 canvas element
+            </canvas>
+        </div>
+        <div>
+            <br />
+            Color:
+            <button type="button" id="white" style="height: 15px; background-color: white"></button>
+            <button type="button" id="red" style="height: 15px; background-color: red"></button>
+            <button type="button" id="blue" style="height: 15px; background-color: blue"></button>
+            <button type="button" id="green" style="height: 15px; background-color: green"></button>
+            <button type="button" id="yellow" style="height: 15px; background-color: yellow"></button>
+            <button type="button" id="cyan" style="height: 15px; background-color: cyan"></button>
+            <button type="button" id="magenta" style="height: 15px; background-color: magenta"></button>
+            <br /><br />
+            <button type="button" id="clear">Clear</button>
+        </div>
 	</body>
 </html>
