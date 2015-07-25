@@ -7,22 +7,13 @@ var bufferSize = 10000000;
 var isDrawing;
 var line;
 var color;
-var cIndex;
-var colors = [
-    vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(1.0, 0.0, 0.0, 1.0),
-    vec4(0.0, 0.0, 1.0, 1.0),
-    vec4(0.0, 1.0, 0.0, 1.0),
-    vec4(1.0, 1.0, 0.0, 1.0),
-    vec4(0.0, 1.0, 1.0, 1.0),
-    vec4(1.0, 0.0, 1.0, 1.0)
-];
+var colors;
 
 window.onload = function init() 
 {
     line = [];
-    cIndex = 0;
-    color = [];
+    colors = [];
+    color = vec4(1.0, 1.0, 1.0, 1.0);
 	isDrawing = false;
 	
 	canvas = document.getElementById("gl-canvas");
@@ -60,7 +51,7 @@ window.onload = function init()
     			vec2( 2 * event.clientX / canvas.width - 1,
             	      2 * (canvas.height - event.clientY) / canvas.height - 1);
     		line.push(point);
-    		color.push(colors[cIndex]);
+    		colors.push(color);
     	});
     
     canvas.addEventListener("mousemove", function(event)
@@ -76,11 +67,11 @@ window.onload = function init()
 				gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 			    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(line));
 			    
-			    color.push(colors[cIndex]);
-			    color.push(colors[cIndex]);
+			    colors.push(color);
+			    colors.push(color);
 			    
 			    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-			    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(color));
+			    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(colors));
     		}
     	});
     
@@ -88,45 +79,37 @@ window.onload = function init()
     	{
     	    isDrawing = false;
 	        line.pop();
-	        color.pop();
+	        colors.pop();
         });
 
     document.getElementById("clear").onclick = function (event)
         {
             line = [];
-            color = [];
+            colors = [];
     };
+    
+    document.getElementById("brush_color").onchange = function (event)
+    	{
+    		var target = event.target || event.srcElement;
+    		var rgb = hexToRgb(target.value);
+    		
+    		if (rgb != null)
+    		{
+    			color = vec4( rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0, 1.0);
+    			console.log(color)
+    		}
+    	};
 
-    document.getElementById("white").onclick = function (event) {
-        cIndex = 0;
-    };
-
-    document.getElementById("red").onclick = function (event) {
-        cIndex = 1;
-    };
-
-    document.getElementById("blue").onclick = function (event) {
-        cIndex = 2;
-    };
-
-    document.getElementById("green").onclick = function (event) {
-        cIndex = 3;
-    };
-
-    document.getElementById("yellow").onclick = function (event) {
-        cIndex = 4;
-    };
-
-    document.getElementById("cyan").onclick = function (event) {
-        cIndex = 5;
-    };
-
-    document.getElementById("magenta").onclick = function (event) {
-        cIndex = 6;
-    };
-    	
     render();
 };
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? 
+    	[parseInt(result[1], 16),
+         parseInt(result[2], 16),
+         parseInt(result[3], 16)] : null;
+}
 
 function render()
 {
