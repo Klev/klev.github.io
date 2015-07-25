@@ -3,12 +3,12 @@
 var canvas;
 var gl;
 
-var bufferSize = 1000000;
+var bufferSize = 10000000;
 var isDrawing;
 var line;
 var color;
-var colors;
-var colorOptions = [
+var cIndex;
+var colors = [
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 0.0, 0.0, 1.0),
     vec4(0.0, 0.0, 1.0, 1.0),
@@ -21,7 +21,8 @@ var colorOptions = [
 window.onload = function init() 
 {
     line = [];
-    color;
+    cIndex = 0;
+    color = [];
 	isDrawing = false;
 	
 	canvas = document.getElementById("gl-canvas");
@@ -46,7 +47,7 @@ window.onload = function init()
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, bufferSize, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, 2 * bufferSize, gl.STATIC_DRAW);
 
     var vColor = gl.getAttribLocation(program, "vColor");
     gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
@@ -59,6 +60,7 @@ window.onload = function init()
     			vec2( 2 * event.clientX / canvas.width - 1,
             	      2 * (canvas.height - event.clientY) / canvas.height - 1);
     		line.push(point);
+    		color.push(colors[cIndex]);
     	});
     
     canvas.addEventListener("mousemove", function(event)
@@ -68,10 +70,17 @@ window.onload = function init()
     			var point = 
     				vec2( 2 * event.clientX / canvas.width - 1,
             	          2 * (canvas.height - event.clientY) / canvas.height - 1);
-            		line.push(point);
+            	line.push(point);
 			    line.push(point);
-
+				
+				gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 			    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(line));
+			    
+			    color.push(colors[cIndex]);
+			    color.push(colors[cIndex]);
+			    
+			    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+			    gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(color));
     		}
     	});
     
@@ -79,39 +88,41 @@ window.onload = function init()
     	{
     	    isDrawing = false;
 	        line.pop();
+	        color.pop();
         });
 
     document.getElementById("clear").onclick = function (event)
         {
             line = [];
+            color = [];
     };
 
     document.getElementById("white").onclick = function (event) {
-        color = colors[0];
+        cIndex = 0;
     };
 
     document.getElementById("red").onclick = function (event) {
-        color = colors[1];
+        cIndex = 1;
     };
 
     document.getElementById("blue").onclick = function (event) {
-        color = colors[2];
+        cIndex = 2;
     };
 
     document.getElementById("green").onclick = function (event) {
-        color = colors[3];
+        cIndex = 3;
     };
 
     document.getElementById("yellow").onclick = function (event) {
-        color = colors[4];
+        cIndex = 4;
     };
 
     document.getElementById("cyan").onclick = function (event) {
-        color = colors[5];
+        cIndex = 5;
     };
 
     document.getElementById("magenta").onclick = function (event) {
-        color = colors[6];
+        cIndex = 6;
     };
     	
     render();
