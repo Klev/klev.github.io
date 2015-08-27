@@ -1,11 +1,27 @@
-﻿"use strict";
+"use strict";
 
 var canvas;
 var gl;
+var program;
 
 var rotation_matrix = rotationMatrixSetup();
 var vertices = [];
-var colors = [];
+// legacy - to remove
+//var colors = [];
+var normals = [];
+
+var lightPosition = vec4(1.0, 1.0, 1.0, 0.0);
+var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
+var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
+var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
+
+var materialAmbient = vec4(0.0, 1.0, 1.0, 1.0);
+var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
+var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
+var materialShininess = 100.0;
+
+var modelView, projection;
+var viewerPos;
 
 var xAxis = 0;
 var yAxis = 1;
@@ -22,9 +38,6 @@ window.onload = function init() {
     glCanvasSetup();
 
     shapes[shape_id]();
-    //cone();
-    //cylinder();
-    //sphere();
 
     shaderProgramSetup();
 
@@ -41,6 +54,7 @@ window.onload = function init() {
         shape_id = (shape_id + 1) % shapes.length;
         shapes[shape_id]();
     }
+
     render();
 };
 
@@ -58,16 +72,16 @@ function glCanvasSetup() {
 
 function shaderProgramSetup()
 {
-    var program = initShaders(gl, "vertex-shader", "fragment-shader");
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+    var nBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, nBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
 
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
+    var vNormal = gl.getAttribLocation(program, "vNormal");
+    gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vNormal);
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -77,7 +91,29 @@ function shaderProgramSetup()
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
-    thetaLoc = gl.getUniformLocation(program, "theta");
+    //thetaLoc = gl.getUniformLocation(program, "theta");
+
+    viewerPos = vec3(0.0, 0.0, -20.0);
+    projection = ortho(-1, 1, -1, 1, -100, 100);
+
+    var ambientProduct = mult(lightAmbient, materialAmbient);
+    var diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    var specularProduct = mult(lightSpecular, materialSpecular);
+
+    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"),
+        flatten(ambientProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"),
+        flatten(diffuseProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),
+        flatten(specularProduct));
+    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"),
+        flatten(lightPosition));
+
+    gl.uniform1f(gl.getUniformLocation(program, "shininess"),
+        materialShininess);
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "projectionMatrix"),
+        false, flatten(projection));
 }
 
 function rotationMatrixSetup() {
@@ -160,9 +196,9 @@ function cylinder() {
         vertices.push(vertices_base[(i + 1) % vertices_base.length]);
         vertices.push(vertices_base[i]);
 
-        colors.push([0.0, 0.0, 1.0, 1.0]);
-        colors.push([0.0, 0.0, 1.0, 1.0]);
-        colors.push([0.0, 0.0, 1.0, 1.0]);
+        //colors.push([0.0, 0.0, 1.0, 1.0]);
+        //colors.push([0.0, 0.0, 1.0, 1.0]);
+        //colors.push([0.0, 0.0, 1.0, 1.0]);
     }
 
     for (var i = 0; i < vertices_top.length; i++) {
@@ -170,9 +206,9 @@ function cylinder() {
         vertices.push(vertices_top[(i + 1) % vertices_top.length]);
         vertices.push(vertices_top[i]);
 
-        colors.push([0.0, 0.0, 1.0, 1.0]);
-        colors.push([0.0, 0.0, 1.0, 1.0]);
-        colors.push([0.0, 0.0, 1.0, 1.0]);
+        //colors.push([0.0, 0.0, 1.0, 1.0]);
+        //colors.push([0.0, 0.0, 1.0, 1.0]);
+        //colors.push([0.0, 0.0, 1.0, 1.0]);
     }
 
     for (var i = 0; i < vertices_top.length; i++) {
@@ -180,17 +216,17 @@ function cylinder() {
         vertices.push(vertices_base[(i + 1) % vertices_base.length]);
         vertices.push(vertices_base[i]);
 
-        colors.push([1.0, 0.0, 0.0, 1.0]);
-        colors.push([1.0, 0.0, 0.0, 1.0]);
-        colors.push([1.0, 0.0, 0.0, 1.0]);
+        //colors.push([1.0, 0.0, 0.0, 1.0]);
+        //colors.push([1.0, 0.0, 0.0, 1.0]);
+        //colors.push([1.0, 0.0, 0.0, 1.0]);
 
         vertices.push(vertices_top[i]);
         vertices.push(vertices_top[(i + 1) % vertices_top.length]);
         vertices.push(vertices_base[(i + 1) % vertices_base.length]);
 
-        colors.push([1.0, 0.0, 0.0, 1.0]);
-        colors.push([1.0, 0.0, 0.0, 1.0]);
-        colors.push([1.0, 0.0, 0.0, 1.0]);
+        //colors.push([1.0, 0.0, 0.0, 1.0]);
+        //colors.push([1.0, 0.0, 0.0, 1.0]);
+        //colors.push([1.0, 0.0, 0.0, 1.0]);
     }
 }
 
@@ -207,9 +243,13 @@ function cone() {
         vertices.push(vertices_base[(i + 1) % vertices_base.length]);
         vertices.push(vertices_base[i]);
 
-        colors.push([0.0, 0.0, 1.0, 1.0]);
-        colors.push([0.0, 0.0, 1.0, 1.0]);
-        colors.push([0.0, 0.0, 1.0, 1.0]);
+        var t1 = subtract(vertices_base[(i + 1) % vertices_base.length], center_base);
+        var t2 = subtract(vertices_base[i], center_base);
+        var normal = normalize(vec3(cross(t1, t2)));
+
+        normals.push(normal);
+        normals.push(normal);
+        normals.push(normal);
     }
 
     // really generates the cone
@@ -218,9 +258,13 @@ function cone() {
         vertices.push(vertices_base[(i + 1) % vertices_base.length]);
         vertices.push(vertices_base[i]);
 
-        colors.push([0.0, 1.0, 0.0, 1.0]);
-        colors.push([0.0, 1.0, 0.0, 1.0]);
-        colors.push([0.0, 1.0, 0.0, 1.0]);
+        var t1 = subtract(vertices_base[(i + 1) % vertices_base.length], top_vertex);
+        var t2 = subtract(vertices_base[i], top_vertex);
+        var normal = normalize(vec3(cross(t2, t1)));
+
+        normals.push(normal);
+        normals.push(normal);
+        normals.push(normal);
     }
 }
 
@@ -230,9 +274,9 @@ function sphere() {
         vertices.push(vec4(b[0], b[1], b[2], 1.0));
         vertices.push(vec4(c[0], c[1], c[2], 1.0));
 
-        colors.push([0.0, 1.0, 0.0, 1.0]);
-        colors.push([0.0, 1.0, 0.0, 1.0]);
-        colors.push([0.0, 1.0, 0.0, 1.0]);
+        //colors.push([0.0, 1.0, 0.0, 1.0]);
+        //colors.push([0.0, 1.0, 0.0, 1.0]);
+        //colors.push([0.0, 1.0, 0.0, 1.0]);
     }
 
     function divideTriangle(a, b, c, count) {
@@ -271,7 +315,15 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     theta[axis] += 2.0;
-    gl.uniform3fv(thetaLoc, theta);
+    //gl.uniform3fv(thetaLoc, theta);
+    
+    modelView = mat4();
+    modelView = mult(modelView, rotate(theta[xAxis], [1, 0, 0]));
+    modelView = mult(modelView, rotate(theta[yAxis], [0, 1, 0]));
+    modelView = mult(modelView, rotate(theta[zAxis], [0, 0, 1]));
+
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, "modelViewMatrix"),
+        false, flatten(modelView));
 
     //gl.drawArrays(gl.TRIANGLES, 0, 120);
     gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
